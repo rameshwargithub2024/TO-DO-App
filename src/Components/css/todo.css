@@ -16,7 +16,7 @@
 .todo {
   height: 600px;
   overflow-y: auto;
-  scrollbar-color: white;
+  
 }
 .todo-header {
   margin-top: 84px;

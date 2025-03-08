@@ -3,18 +3,26 @@ import "./css/todo.css";
 import Todoitem from "./todoitem";
 
 const Todo = () => {
-  const countRef = useRef(0); // Use useRef instead of let count
+  const countRef = useRef(0);
   const [todos, setTodos] = useState([]);
   const inputRef = useRef(null);
 
   const add = () => {
+    const text = inputRef.current.value.trim();
+    if (!text) return; // Prevent empty todos
+
     const newTodo = {
-      no: countRef.current++, // Use countRef.current
-      text: inputRef.current.value,
+      no: countRef.current++,
+      text: text,
       display: "",
     };
 
-    setTodos((prevTodos) => [...prevTodos, newTodo]);
+    setTodos((prevTodos) => {
+      const updatedTodos = [...prevTodos, newTodo];
+      localStorage.setItem("todos", JSON.stringify(updatedTodos));
+      return updatedTodos;
+    });
+
     inputRef.current.value = "";
     localStorage.setItem("todos_count", countRef.current);
   };
@@ -24,14 +32,11 @@ const Todo = () => {
     setTodos(savedTodos);
 
     const savedCount = localStorage.getItem("todos_count");
-    countRef.current = savedCount ? parseInt(savedCount, 10) : 0; // Convert to number
+    countRef.current = savedCount ? parseInt(savedCount, 10) : 0;
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      console.log(todos);
-      localStorage.setItem("todos", JSON.stringify(todos));
-    }, 100);
+    localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
   return (
@@ -49,9 +54,9 @@ const Todo = () => {
         </div>
       </div>
       <div className="todo-list">
-        {todos.map((item, index) => (
+        {todos.map((item) => (
           <Todoitem
-            key={index}
+            key={item.no}
             setTodos={setTodos}
             no={item.no}
             display={item.display}
